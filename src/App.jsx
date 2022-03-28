@@ -4,9 +4,11 @@ import { getPlacesData } from './api';
 import { Header, List, Map } from './components';
 
 const App = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const [places, setPlaces] = useState([]);
+  const [childClick, setChildClick] = useState(null);
   const [coordinates, setCoordinates] = useState({});
-  const [bounds, setBounds] = useState(null);
+  const [bounds, setBounds] = useState({});
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
@@ -17,10 +19,11 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    console.log(bounds);
+    setIsLoading(true);
+    // console.log(bounds);
     getPlacesData(bounds.sw, bounds.ne).then((data) => {
-      console.log(data, bounds);
       setPlaces(data);
+      setIsLoading(false);
     });
   }, [coordinates, bounds]);
 
@@ -30,13 +33,15 @@ const App = () => {
       <Header />
       <Grid container spacing={3} style={{ width: '100%' }}>
         <Grid item sx={12} md={4}>
-          <List places={places} />
+          <List places={places} childClick={childClick} isLoading={isLoading} />
         </Grid>
         <Grid item sx={12} md={8}>
           <Map
             setCoordinates={setCoordinates}
             setBounds={setBounds}
             coordinates={coordinates}
+            places={places}
+            setChildClick={setChildClick}
           />
         </Grid>
       </Grid>
